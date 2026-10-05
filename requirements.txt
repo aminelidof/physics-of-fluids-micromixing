@@ -1,0 +1,12 @@
+# Core scientific stack
+numpy>=1.24
+matplotlib>=3.7
+
+# Physics-informed neural networks
+deepxde>=1.0
+tensorflow>=2.12        # CPU is sufficient; native-Windows GPU is not supported for TF >= 2.11
+
+# Manuscript generation (optional: only for make_docx.py)
+python-docx>=1.1
+
+# Tested with: Python 3.10, Windows 10/11, TensorFlow 2.15, DeepXDE 1.13
