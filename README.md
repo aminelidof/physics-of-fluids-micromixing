@@ -1,5 +1,11 @@
 # TRIZ-guided magnetic micromixing in lab-on-a-chip devices — PINN assessment
 
+Authors: Mohamed El Amine Fodil1,2,, Merwan Abdelbari3, Meriem Fodil3
+1 Department of Hydraulics, Maghnia University Centre, Tlemcen, Algeria
+2 Laboratoire Ingénierie et Sciences Appliquées (IScApp), Maghnia, Tlemcen, Algeria
+3 Department of Mechanics, Hassiba Ben Bouali University, Chlef, Algeria
+Corresponding Author Email: fodilmedam@gmail.com
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/)
 [![PINN DeepXDE](https://img.shields.io/badge/PINN-DeepXDE-orange.svg)](https://github.com/lululxvi/deepxde)
@@ -37,8 +43,5 @@ The steady advection-dispersion model with a Poiseuille profile ($\mathrm{Pe} = 
 ## Repository Structure
 
 ```text
-├── data/               # Experimental and numerical validation datasets
-├── models/             # DeepXDE PINN architecture and training scripts
-├── src/                # Finite-difference solver and evaluation scripts
-├── check_quality.py    # Verification and validation quality check script
+├── src/                # Finite-difference solver and evaluation scripts + DeepXDE PINN architecture and training scripts + ├                         Verification and validation quality check script + check_quality.py 
 └── README.md
