@@ -1,16 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-============================================================================
- run_verification.py (v2 — complet)
- Verification (critere 4) + metriques de validation (critere 5).
- Corrections integrees :
-  - L_mix INTERPOLE au croisement du seuil (independance grille reelle) ;
-  - R2 global + R2 de la zone de melange (x* <= 1) ou la variance vit ;
-  - hessian i=1, j=1 ; feature transform ; tf seed.
- Duree : ~15 min (dont ~8 min pour l'etude de collocation).
- Sorties : verification.json + figure_verification.png
-============================================================================
-"""
+
 import os, glob, json
 import numpy as np
 import matplotlib
@@ -20,7 +9,6 @@ import matplotlib.pyplot as plt
 os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
 os.environ.setdefault("DDE_BACKEND", "tensorflow")
 
-# ═══════════════ PARAMETRES (coherents run_micromix v3) ═══════════════
 L, H, D, U, KAPPA = 5.0e-4, 1.0e-4, 1.0e-9, 1.0e-4, 8.0
 Ls, DELTA, PE, Ts = L / H, 0.1, U * H / D, 1.0
 GRID_N  = [125, 250, 500]          # etude de maillage FDM
@@ -51,7 +39,6 @@ def solve_fdm(kappa, nx, ny, Ts=Ts):
     return x, y, C
 
 def L_mix_interp(x, C, frac=0.05):
-    """Croisement du seuil INTERPOLE (independance grille reelle)."""
     v = C.var(axis=0); thr = frac * v[0]
     idx = np.where(v <= thr)[0]
     if not len(idx):
@@ -63,14 +50,12 @@ def L_mix_interp(x, C, frac=0.05):
     return float(x[k] if v1 == v2 else
                  x[k - 1] + (v1 - thr) / (v1 - v2) * (x[k] - x[k - 1]))
 
-# ═══════════════ 1. CHARGEMENT DU RUN VALID ═══════════════
 d = sorted(glob.glob("results_[0-9]*"))[-1]
 z = np.load(os.path.join(d, "champs.npz"))
 x, y = z["x"], z["y"]
 Cp, Cr = z["c_apres_pinn"], z["c_apres_ref"]
 print("Source : {} (champs.npz)".format(d))
 
-# ═══════════════ 2. METRIQUES DE VALIDATION (critere 5) ═══════════════
 diff = (Cp - Cr).ravel()
 l2   = float(np.linalg.norm(Cp - Cr) / np.linalg.norm(Cr))
 rmse = float(np.sqrt(np.mean(diff ** 2)))
@@ -85,12 +70,10 @@ r2_zone = 1.0 - float(np.sum((Cpz - Crz) ** 2)) / \
 print("L2 = {:.2%} | RMSE = {:.1e} | MAE = {:.1e} | R2 = {:.4f} | R2(zone) = {:.4f}".format(
       l2, rmse, mae, r2, r2_zone))
 
-# ═══════════════ 3. CONSERVATION (critere 4) ═══════════════
 cons_p = abs(float(Cp.mean()) - 0.5)
 cons_f = abs(float(Cr.mean()) - 0.5)
 print("Conservation |<c>-0.5| : PINN = {:.1e} | FDM = {:.1e}".format(cons_p, cons_f))
 
-# ═══════════════ 4. RESIDUS (depuis loss_history) ═══════════════
 lf = sorted(glob.glob(os.path.join(d, "loss_history_seed*.csv")))
 res_fin, bc_fin = float("nan"), float("nan")
 if lf:
@@ -101,7 +84,6 @@ if lf:
         bc_fin = float(sum(hist[n][-1] for n in bcs))
 print("Residu PDE final = {:.1e} | loss BC finales = {:.1e}".format(res_fin, bc_fin))
 
-# ═══════════════ 5. INDEPENDANCE DE MAILLAGE (FDM) ═══════════════
 Lm = []
 for nx in GRID_N:
     ny = max(13, int(0.1 * nx))
@@ -109,7 +91,6 @@ for nx in GRID_N:
     Lm.append(L_mix_interp(xg, Cg))
     print("Grille {:4d}x{:3d} : L_mix* = {:.4f}".format(nx, ny, Lm[-1]))
 
-# ═══════════════ 6. INDEPENDANCE DE COLLOCATION (PINN courts) ═══════════════
 col_l2 = []
 for nf in COL_N:
     print("Collocation N_f = {} (entrainement court)...".format(nf))
@@ -167,7 +148,6 @@ for nf in COL_N:
         col_l2.append(float("nan"))
     print("   L2 = {:.2%}".format(col_l2[-1]))
 
-# ═══════════════ 7. SAUVEGARDES ═══════════════
 res = dict(source=d, L2_pct=100.0 * l2, RMSE=rmse, MAE=mae,
            R2=r2, R2_zone=r2_zone,
            conservation_pin=cons_p, conservation_fdm=cons_f,
