@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Verdict automatique de solidite (v2 — format liste corrige, seuil R2 justifie)."""
+
 import json, os
 
 OK = WARN = FAIL = 0
