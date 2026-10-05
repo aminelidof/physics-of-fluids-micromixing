@@ -1,18 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-============================================================================
- run_inverse.py (v4 — complet)
- Identification inverse de kappa (critere 11).
- Ameliorations v4 :
-  - observations concentrees dans la zone de melange (x* <= 1.5), la seule
-    region ou le champ depend de kappa (design d'experience, a documenter) ;
-  - NOBS = 400 ; Adam 6000 (initialisation) ;
-  - RESTARTS L-BFGS x2 (un seul passage s'arrete trop tot sur ftol) ;
-  - get_kappa robuste (propriete OU methode) ; sauvegarde incrementale.
- Duree : ~15-20 min par niveau de bruit (3 niveaux).
- Sorties : inverse.json + figure_inverse.png
-============================================================================
-"""
 import os, json
 import numpy as np
 import matplotlib
@@ -23,7 +9,6 @@ os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
 os.environ.setdefault("DDE_BACKEND", "tensorflow")
 import deepxde as dde
 
-# ═══════════════ PARAMETRES ═══════════════
 L, H, D, U, KAPPA_TRUE = 5.0e-4, 1.0e-4, 1.0e-9, 1.0e-4, 8.0
 Ls, DELTA, PE, Ts = L / H, 0.1, U * H / D, 1.0
 NOBS, ITER, LBFGS_ITER, RESTARTS = 400, 6000, 3000, 2
@@ -60,7 +45,6 @@ def get_kappa(var):
         kv = kv()
     return float(np.asarray(kv).ravel()[0])
 
-# ═══════════════ OBSERVATIONS (kappa inconnu) ═══════════════
 x, y, Ctrue = solve_fdm(KAPPA_TRUE)
 rng = np.random.default_rng(7)
 pts = np.column_stack([rng.uniform(0, X_OBS_MAX, NOBS),
@@ -74,7 +58,6 @@ cobs = (Ctrue[j0, i0] * (1 - tx) * (1 - ty) + Ctrue[j0, i0 + 1] * tx * (1 - ty)
         + Ctrue[j0 + 1, i0] * (1 - tx) * ty + Ctrue[j0 + 1, i0 + 1] * tx * ty)
 print("Observations : {} points dans x* <= {} (zone de melange)".format(NOBS, X_OBS_MAX))
 
-# ═══════════════ IDENTIFICATION INVERSE ═══════════════
 rows, curves = [], []
 for sn in NOISE:
     print("=" * 60)
@@ -149,7 +132,6 @@ for sn in NOISE:
     with open("inverse.json", "w", encoding="utf-8") as f:
         json.dump(rows, f, indent=2)
 
-# ═══════════════ FIGURE ═══════════════
 fig, ax = plt.subplots(figsize=(7, 4.2))
 if rows:
     pos = np.arange(len(rows))
