@@ -43,5 +43,5 @@ The steady advection-dispersion model with a Poiseuille profile ($\mathrm{Pe} = 
 ## Repository Structure
 
 ```text
-├── src/                # Finite-difference solver and evaluation scripts + DeepXDE PINN architecture and training scripts + ├                         Verification and validation quality check script + check_quality.py 
+├── src/                # Finite-difference solver and evaluation scripts + DeepXDE PINN architecture and training scripts + ├ Verification and validation quality check script + check_quality.py 
 └── README.md
