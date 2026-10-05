@@ -1,23 +1,44 @@
-TRIZ-guided magnetic micromixing in lab-on-a-chip devices — PINN assessment
-License: MITPython 3.10DeepXDE
+# TRIZ-guided magnetic micromixing in lab-on-a-chip devices — PINN assessment
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/)
+[![PINN DeepXDE](https://img.shields.io/badge/PINN-DeepXDE-orange.svg)](https://github.com/lululxvi/deepxde)
 
 Code and data for the manuscript:
 
-"Resolving the productivity–harmful-factors contradiction in lab-on-a-chipmicromixing: TRIZ-guided intensification of transverse dispersion assessedby physics-informed neural networks"(submitted to Physics of Fluids)
+> **"Resolving the productivity–harmful-factors contradiction in lab-on-a-chip micromixing: TRIZ-guided intensification of transverse dispersion assessed by physics-informed neural networks"** *(submitted to Physics of Fluids)*
 
-Summary
-A TRIZ technical contradiction — productivity (parameter 39) vsinternally generated harmful factors (parameter 31) — is resolved byinventive principle 24 (Intermediary): superparamagnetic nanoparticles,agitated by an oscillating external magnetic field, act as a contactlessintermediary that intensifies the transverse dispersion by a factor κ,without any increase in driving pressure.
+---
 
-The steady advection–dispersion model with a Poiseuille profile (Pe = 10) issolved by a physics-informed neural network (DeepXDE) and independentlyby a time-marching finite-difference solver.
+## Summary
 
-Key results
-Quantity	Value
-Relative L₂ error (PINN vs FDM, 5 runs)	1.34% ± 0.00
-RMSE / MAE	6.7e-3 / 6.0e-3
-R² (full field / mixing region)	0.984 / 0.9996
-Mixing-time reduction	1.29 s → 0.26 s (gain 80%), pressure unchanged
-Parametric map (Pe ∈ [2.5, 20] × κ ∈ [1, 8])	gain 32–84% (vs bound 1 − 1/κ)
-Robustness (N_o = 200, σ_n ≤ 10%)	L₂ < 1.2%; L_mix varies < 1%
-Inverse identification of κ	κ̂ = 7.96 (0.5% error, noise-free)
-Verification	residual 4.2e-5; conservation 5.9e-3; grid/collocation-independent
-Quality verdict (check_quality.py)	19 OK, 1 WARN, 0 FAIL
+A TRIZ technical contradiction — **productivity (parameter 39) vs internally generated harmful factors (parameter 31)** — is resolved by **inventive principle 24 (Intermediary)**: superparamagnetic nanoparticles, agitated by an oscillating external magnetic field, act as a contactless intermediary that intensifies the transverse dispersion by a factor $\kappa$, without any increase in driving pressure[cite: 1].
+
+The steady advection-dispersion model with a Poiseuille profile ($\mathrm{Pe} = 10$) is solved by a **physics-informed neural network (DeepXDE)** and independently by a time-marching finite-difference solver[cite: 1].
+
+---
+
+## Key Results
+
+| Quantity | Value |
+| :--- | :--- |
+| **Relative $L_2$ error** (PINN vs FDM, 5 runs)[cite: 2] | $1.34\% \pm 0.00$[cite: 2] |
+| **RMSE / MAE**[cite: 2] | $6.7\mathrm{e}{-3} / 6.0\mathrm{e}{-3}$[cite: 2] |
+| **$R^2$** (full field / mixing region)[cite: 2] | $0.984 / 0.9996$[cite: 2] |
+| **Mixing-time reduction**[cite: 2] | $1.29\text{ s} \to 0.26\text{ s}$ (gain $80\%$), pressure unchanged[cite: 2] |
+| **Parametric map** ($\mathrm{Pe} \in [2.5, 20] \times \kappa \in [1, 8]$)[cite: 2] | gain $32\text{--}84\%$ (vs bound $1 - 1/\kappa$)[cite: 2] |
+| **Robustness** ($N_o = 200, \sigma_n \le 10\%$)[cite: 2] | $L_2 < 1.2\%$; $L_{\text{mix}}$ varies $< 1\%$[cite: 2] |
+| **Inverse identification of $\kappa$**[cite: 2] | $\hat{\kappa} = 7.96$ ($0.5\%$ error, noise-free)[cite: 2] |
+| **Verification**[cite: 2] | residual $4.2\mathrm{e}{-5}$; conservation $5.9\mathrm{e}{-3}$; grid/collocation-independent[cite: 2] |
+| **Quality verdict** (`check_quality.py`)[cite: 2] | 19 OK, 1 WARN, 0 FAIL[cite: 2] |
+
+---
+
+## Repository Structure
+
+```text
+├── data/               # Experimental and numerical validation datasets
+├── models/             # DeepXDE PINN architecture and training scripts
+├── scripts/            # Finite-difference solver and evaluation scripts
+├── check_quality.py    # Verification and validation quality check script
+└── README.md
