@@ -1,15 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-============================================================================
- run_parametric.py (v3 — corrige et coherent avec run_micromix v3)
- Correctifs : Ls = 5 ; delta = 0.1 PARTOUT (FDM et PINN) ;
-              pinn_L_mix(PE, kappa, iterations) — Ts interne ;
-              code mort supprime ; kappa_max = 8 (resolution FDM) ;
-              hessian i=1, j=1 (derivee croisee corrigee).
- Figures en anglais, sans titres.
- Duree : balayage ~2-3 min + 2 validations PINN (~30 min chacune).
-============================================================================
-"""
+
 import os, json, time
 import numpy as np
 import matplotlib
@@ -19,16 +9,15 @@ from datetime import datetime
 
 os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
 
-# ═══════════════════════ PARAMETRES (coherents avec run_micromix) ═══════════════════════
-L, H, D = 5.0e-4, 1.0e-4, 1.0e-9      # Ls = 5 (meme domaine que run_micromix)
+L, H, D = 5.0e-4, 1.0e-4, 1.0e-9     
 Ls = L / H
-DELTA = 0.1                            # meme interface que run_micromix
+DELTA = 0.1                            
 NX, NY, FRAC = 250, 25, 0.05
 
 PE_LIST    = [2.5, 5.0, 10.0, 20.0]
-KAPPA_LIST = [1.0, 2.0, 4.0, 8.0]      # kappa=16 retire (sous-resolution FDM)
+KAPPA_LIST = [1.0, 2.0, 4.0, 8.0]     
 
-PINN_CHECK = [(10.0, 8.0), (5.0, 4.0)] # points valides par PINN (etoiles)
+PINN_CHECK = [(10.0, 8.0), (5.0, 4.0)] 
 PINN_ITER  = 8000
 
 RUN_DIR = "results_parametrique_" + datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -41,7 +30,6 @@ def save_json(name, obj):
 def sig(x, delta=DELTA):
     return 1.0 / (1.0 + np.exp(-(np.asarray(x) - 0.5) / delta))
 
-# ═══════════════════════ SOLVEUR DE REFERENCE ═══════════════════════
 def solve_fdm(PE, kappa, Ts, nx=NX, ny=NY):
     dx, dy = Ls / (nx - 1), 1.0 / (ny - 1)
     dt = min(0.2 * dy * dy / kappa, 0.2 * dx * dx, 0.4 * dx / (PE * 1.5))
@@ -71,10 +59,7 @@ def mixing_length(x, C, frac=FRAC):
 def t_mix(Lstar, PE):
     return Lstar * H * H / (PE * D)
 
-# ═══════════════════════ VALIDATION PINN (stationnaire) ═══════════════════════
 def pinn_L_mix(PE, kappa, iterations):
-    """PINN stationnaire sur (Pe, kappa) : retourne (L_mix*, L2 vs FDM).
-    Ts est calcule en interne (regime etabli pour la reference FDM)."""
     os.environ.setdefault("DDE_BACKEND", "tensorflow")
     import deepxde as dde
     try:
@@ -88,10 +73,10 @@ def pinn_L_mix(PE, kappa, iterations):
         pass
     geom = dde.geometry.Rectangle([0.0, 0.0], [Ls, 1.0])
     def pde(x, y):
-        dc_x  = dde.grad.jacobian(y, x, i=0, j=0)      # dc/dx
-        dc_xx = dde.grad.hessian(y, x, i=0, j=0)       # d2c/dx2
-        dc_yy = dde.grad.hessian(y, x, i=1, j=1)       # d2c/dy2  <-- CORRECTIF
-        u_val = 6.0 * x[:, 1:2] * (1.0 - x[:, 1:2])    # Poiseuille
+        dc_x  = dde.grad.jacobian(y, x, i=0, j=0)      
+        dc_xx = dde.grad.hessian(y, x, i=0, j=0)       
+        dc_yy = dde.grad.hessian(y, x, i=1, j=1)      
+        u_val = 6.0 * x[:, 1:2] * (1.0 - x[:, 1:2])    
         return PE * u_val * dc_x - dc_xx - kappa * dc_yy
     def on_inlet(x, ob): return ob and np.isclose(x[0], 0.0)
     def on_rest(x, ob):  return ob and not np.isclose(x[0], 0.0)
@@ -119,7 +104,7 @@ def pinn_L_mix(PE, kappa, iterations):
         model.train(iterations=2000, display_every=2000)
     except Exception:
         pass
-    Ts = max(2.0 * Ls / PE, 0.5)          # Ts interne (regime etabli)
+    Ts = max(2.0 * Ls / PE, 0.5)          
     x, y, C_ref = solve_fdm(PE, kappa, Ts)
     Xg, Yg = np.meshgrid(x, y)
     pts = np.stack([Xg.ravel(), Yg.ravel()], axis=1).astype(np.float32)
@@ -127,7 +112,6 @@ def pinn_L_mix(PE, kappa, iterations):
     l2 = float(np.linalg.norm(C_p - C_ref) / np.linalg.norm(C_ref))
     return mixing_length(x, C_p), l2
 
-# ═══════════════════════ BALAYAGE Pe x kappa ═══════════════════════
 t0 = time.time()
 rows, pinn_rows = [], []
 GAIN = np.zeros((len(KAPPA_LIST), len(PE_LIST)))
@@ -155,7 +139,6 @@ for pe_c, ka_c in PINN_CHECK:
                       abs(L_pinn - L_fdm) / L_fdm * 100.0, l2 * 100.0])
     print("   L_mix* PINN = {:.3f} | FDM = {:.3f} | L2 = {:.2%}".format(L_pinn, L_fdm, l2))
 
-# ═══════════════════════ CARTE (anglais, sans titres) ═══════════════════════
 def cell_edges(v):
     v = np.asarray(v, float)
     mids = (v[:-1] + v[1:]) / 2.0
@@ -186,7 +169,6 @@ fig.tight_layout()
 fig.savefig(os.path.join(RUN_DIR, "carte_gain.png"), dpi=300, bbox_inches="tight")
 plt.close(fig)
 
-# ═══════════════════════ SAUVEGARDES ═══════════════════════
 np.savetxt(os.path.join(RUN_DIR, "parametrique.csv"), np.array(rows), delimiter=",",
            header="Pe,kappa,Ts,L_mix_kappa1,L_mix,L_mix_m,t_mix_s,gain_pct", comments="")
 if pinn_rows:
