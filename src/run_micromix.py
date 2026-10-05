@@ -1,16 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-============================================================================
- run_micromix.py (v3 — CORRIGE)
- CORRECTIF DECISIF : dc_yy = dde.grad.hessian(y, x, i=1, j=1)
-   (l'ancien i=0, j=1 calculait la derivee CROISEE d2c/dxdy, ce qui
-    rendait sig(y) solution exacte de la mauvaise equation -> loss
-    parfaite mais champ faux. Voir diagnostic.)
- Autres correctifs : tf.random.set_seed (seeds reellement differents).
- Figures en anglais, sans titres (pretes pour le manuscrit).
- 5 seeds : moyenne +/- sigma. Duree ~ 70 min (Adam 10000 + L-BFGS).
-============================================================================
-"""
+
 import os, json, time
 import numpy as np
 import matplotlib
@@ -22,7 +11,6 @@ os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
 os.environ.setdefault("DDE_BACKEND", "tensorflow")
 import deepxde as dde
 
-# ═══════════════════ PARAMETRES ═══════════════════
 L, H  = 5.0e-4, 1.0e-4     # canal [m] -> Ls = 5 (domaine utile)
 D     = 1.0e-9             # diffusivite moleculaire [m2/s]
 U     = 1.0e-4             # vitesse debitante [m/s]
@@ -51,7 +39,6 @@ save_json("config.json", dict(L=L, H=H, D=D, U=U, KAPPA=KAPPA, T_END=T_END,
           fix="hessian i=1 j=1 pour d2c/dy2"))
 print("Dossier :", RUN_DIR, "| Pe = {:.2f} | Ls = {:.1f}".format(PE, Ls))
 
-# ═══════════════════ FONCTIONS COMMUNES ═══════════════════
 def sig(x, delta=DELTA):
     return 1.0 / (1.0 + np.exp(-(np.asarray(x) - 0.5) / delta))
 
@@ -106,7 +93,6 @@ def plot_convergence(steps, comps, seed):
     fig.savefig(os.path.join(RUN_DIR, "convergence_seed{}.png".format(seed)), dpi=300)
     plt.close(fig)
 
-# ═══════════════ PINN STATIONNAIRE (regime etabli) ═══════════════
 def build_and_train(seed):
     """Pe*u*(y) dc/dx = d2c/dx2 + kappa*d2c/dy2 — CORRIGE."""
     np.random.seed(seed)
@@ -171,7 +157,6 @@ def predict_field(model, x, y):
     pts = np.stack([Xg.ravel(), Yg.ravel()], axis=1).astype(np.float32)
     return model.predict(pts).reshape(len(y), len(x))
 
-# ═══════════════════ EXECUTION ═══════════════════
 t0 = time.time()
 print("[1/5] References FDM (time-marching -> regime etabli)...")
 x, y, C_ref_before = reference_fdm(1.0)
