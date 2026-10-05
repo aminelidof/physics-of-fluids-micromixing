@@ -1,0 +1,21 @@
+{
+  "date": "2026-10-03T15:12:49.784197",
+  "duree_s": 10117.3,
+  "dossier": "results_20261003_122412",
+  "parametres": {
+    "L": 0.0005,
+    "H": 0.0001,
+    "D": 1e-09,
+    "U": 0.0001,
+    "KAPPA": 8.0,
+    "T_END": 10.0
+  },
+  "resultats": {
+    "gain_pct": 79.7,
+    "gain_std": 0.0,
+    "erreur_L2_pct": 1.34,
+    "t_mix_avant_s": 1.29,
+    "t_mix_apres_s": 0.26
+  },
+  "article_snippet_en": "A physics-informed neural network (DeepXDE) solves the steady 2D advection-dispersion equation with a Poiseuille profile (Pe = 10.0), while an independent time-marching finite-difference solver provides the cross-validation (relative L2 error of 1.34 +/- 0.00% over 5 runs). The magnetically intensified dispersion (kappa = 8, TRIZ principle 24) reduces the mixing length from 0.13 mm to 0.03 mm, i.e. the mixing time from 1.29 s to 0.26 s (gain of 79.7 +/- 0.0%), without any increase in driving pressure."
+}

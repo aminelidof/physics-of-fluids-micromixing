@@ -1,0 +1,31 @@
+{
+  "date": "2026-10-03T16:46:13.776504",
+  "duree_s": 3038.7,
+  "PE_LIST": [
+    2.5,
+    5.0,
+    10.0,
+    20.0
+  ],
+  "KAPPA_LIST": [
+    1.0,
+    2.0,
+    4.0,
+    8.0
+  ],
+  "H": 0.0001,
+  "D": 1e-09,
+  "L": 0.0005,
+  "pinn_check": [
+    [
+      10.0,
+      8.0
+    ],
+    [
+      5.0,
+      4.0
+    ]
+  ],
+  "interpretation": "A faible Pe, la diffusion longitudinale participe au melange et le gain de l'agitation est amorti ; a Pe eleve, le gain tend vers la borne theorique (1 - 1/kappa).",
+  "article_snippet_en": "A parametric study over Pe in [2.5, 20] and kappa in [1, 8] shows that the mixing gain ranges from 32% to 84%, approaching the theoretical bound (1 - 1/kappa) as Pe increases, while low-Pe regimes are partially homogenized by longitudinal diffusion."
+}

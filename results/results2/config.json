@@ -1,0 +1,27 @@
+{
+  "L": 0.0005,
+  "H": 0.0001,
+  "D": 1e-09,
+  "U": 0.0001,
+  "KAPPA": 8.0,
+  "T_END": 10.0,
+  "DELTA": 0.1,
+  "PE": 10.0,
+  "Ls": 5.0,
+  "Ts": 1.0,
+  "ITER": 10000,
+  "LBFGS_ITER": 2000,
+  "LR": 0.001,
+  "DISPLAY_EVERY": 100,
+  "SEEDS": [
+    42,
+    1,
+    7,
+    123,
+    2024
+  ],
+  "WIDTH": 64,
+  "DEPTH": 4,
+  "formulation": "steady PINN vs time-marching FDM",
+  "fix": "hessian i=1 j=1 pour d2c/dy2"
+}
