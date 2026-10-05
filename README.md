@@ -39,6 +39,6 @@ The steady advection-dispersion model with a Poiseuille profile ($\mathrm{Pe} = 
 ```text
 ├── data/               # Experimental and numerical validation datasets
 ├── models/             # DeepXDE PINN architecture and training scripts
-├── scripts/            # Finite-difference solver and evaluation scripts
+├── src/                # Finite-difference solver and evaluation scripts
 ├── check_quality.py    # Verification and validation quality check script
 └── README.md
