@@ -22,7 +22,7 @@ if v:
     check("L2 error (%)", round(v["L2_pct"], 2), v["L2_pct"] <= 5, "<= 5")
     check("RMSE", "{:.1e}".format(v["RMSE"]), v["RMSE"] <= 1e-2, "<= 1e-2")
     check("MAE", "{:.1e}".format(v["MAE"]), v["MAE"] <= 1e-2, "<= 1e-2")
-    # R2 global : seuil 0.98 justifie (champ etabli quasi uniforme -> SST faible)
+
     check("R2 (champ complet)", round(v["R2"], 4), v["R2"] >= 0.98, ">= 0.98*",
           warn_only=(v["R2"] >= 0.97))
     if "R2_zone" in v:
@@ -44,7 +44,7 @@ if b:
     print("=" * 74); print("ROBUSTESSE AU BRUIT"); print("=" * 74)
     L2s = [r["L2"] for r in b]
     base = L2s[0]
-    # Critere de STABILITE (correct) : l'erreur ne croit pas plus vite que le bruit
+
     stable = all(b[i]["L2"] <= base + 2 * 100 * b[i]["sigma"] + 0.5
                  for i in range(len(b)))
     check("Stabilite L2(0)+2*sigma", [round(x, 1) for x in L2s], stable,
