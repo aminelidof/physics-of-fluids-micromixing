@@ -11,12 +11,12 @@ os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
 os.environ.setdefault("DDE_BACKEND", "tensorflow")
 import deepxde as dde
 
-L, H  = 5.0e-4, 1.0e-4     # canal [m] -> Ls = 5 (domaine utile)
-D     = 1.0e-9             # diffusivite moleculaire [m2/s]
-U     = 1.0e-4             # vitesse debitante [m/s]
-KAPPA = 8.0                # principe TRIZ 24 : agitation magnetique
-T_END = 10.0               # Ts = 1 (>= 2 transits pour la FDM)
-DELTA = 0.1                # epaisseur d'interface (adoucie)
+L, H  = 5.0e-4, 1.0e-4     
+D     = 1.0e-9            
+U     = 1.0e-4           
+KAPPA = 8.0                
+T_END = 10.0              
+DELTA = 0.1                
 
 ITER, LBFGS_ITER = 10000, 2000
 LR, DISPLAY_EVERY = 1e-3, 100
@@ -51,7 +51,7 @@ def reference_fdm(kappa, nx=250, ny=25):
     rx, ry = dt / (dx * dx), kappa * dt / (dy * dy)
     x = np.linspace(0.0, Ls, nx); y = np.linspace(0.0, 1.0, ny)
     u = 6.0 * y * (1.0 - y)
-    X, Y = np.meshgrid(x, y)                      # (ny, nx)
+    X, Y = np.meshgrid(x, y)                    
     C = sig(Y); inlet = sig(y)
     for n in range(nt):
         Cn = C.copy(); core = Cn[1:-1, 1:-1]
@@ -100,7 +100,7 @@ def build_and_train(seed):
         dde.config.set_random_seed(seed)
     except Exception:
         pass
-    try:                                    # fix : diversifier reellement les seeds
+    try:                                    
         import tensorflow as tf
         tf.random.set_seed(seed)
     except Exception:
@@ -108,10 +108,10 @@ def build_and_train(seed):
     geom = dde.geometry.Rectangle([0.0, 0.0], [Ls, 1.0])
 
     def pde(x, y):
-        dc_x  = dde.grad.jacobian(y, x, i=0, j=0)      # dc/dx
-        dc_xx = dde.grad.hessian(y, x, i=0, j=0)       # d2c/dx2
-        dc_yy = dde.grad.hessian(y, x, i=1, j=1)       # d2c/dy2  <-- CORRECTIF
-        u_val = 6.0 * x[:, 1:2] * (1.0 - x[:, 1:2])    # Poiseuille
+        dc_x  = dde.grad.jacobian(y, x, i=0, j=0)      
+        dc_xx = dde.grad.hessian(y, x, i=0, j=0)      
+        dc_yy = dde.grad.hessian(y, x, i=1, j=1)      
+        u_val = 6.0 * x[:, 1:2] * (1.0 - x[:, 1:2])    
         return PE * u_val * dc_x - dc_xx - KAPPA * dc_yy
 
     def on_inlet(x, ob): return ob and np.isclose(x[0], 0.0)
@@ -130,7 +130,7 @@ def build_and_train(seed):
         net = dde.nn.FNN(dims, "tanh", "Glorot uniform")
     except AttributeError:
         net = dde.maps.FNN(dims, "tanh", "Glorot uniform")
-    try:                                    # normalisation des entrees (anti-saturation)
+    try:                                   
         scale = np.array([1.0 / Ls, 1.0])
         net.apply_feature_transform(lambda x: x * scale)
     except Exception:
@@ -140,7 +140,7 @@ def build_and_train(seed):
     model.compile("adam", lr=LR)
     lh1, ts1 = model.train(iterations=ITER, display_every=DISPLAY_EVERY)
     steps = list(lh1.steps); comps = list(lh1.loss_train)
-    try:                                    # raffinement L-BFGS
+    try:                                  
         model.compile("L-BFGS")
         lh2, ts2 = model.train(iterations=LBFGS_ITER, display_every=LBFGS_ITER)
         if lh2.steps and lh2.loss_train:
