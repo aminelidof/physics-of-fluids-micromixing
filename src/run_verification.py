@@ -11,9 +11,9 @@ os.environ.setdefault("DDE_BACKEND", "tensorflow")
 
 L, H, D, U, KAPPA = 5.0e-4, 1.0e-4, 1.0e-9, 1.0e-4, 8.0
 Ls, DELTA, PE, Ts = L / H, 0.1, U * H / D, 1.0
-GRID_N  = [125, 250, 500]          # etude de maillage FDM
-COL_N   = [2000, 4000, 8000]       # etude de collocation PINN
-COL_ITER, COL_LBFGS = 3000, 1000   # entrainements courts
+GRID_N  = [125, 250, 500]         
+COL_N   = [2000, 4000, 8000]       
+COL_ITER, COL_LBFGS = 3000, 1000  
 
 def sig(x):
     return 1.0 / (1.0 + np.exp(-(np.asarray(x) - 0.5) / DELTA))
@@ -62,7 +62,7 @@ rmse = float(np.sqrt(np.mean(diff ** 2)))
 mae  = float(np.mean(np.abs(diff)))
 sst  = float(np.sum((Cr - Cr.mean()) ** 2))
 r2   = 1.0 - float(np.sum(diff ** 2)) / sst
-# R2 restreint a la zone de melange (x* <= 1) : la seule ou la variance vit
+
 jz = int(np.argmin(np.abs(x - 1.0)))
 Cpz, Crz = Cp[:, :jz], Cr[:, :jz]
 r2_zone = 1.0 - float(np.sum((Cpz - Crz) ** 2)) / \
@@ -109,7 +109,7 @@ for nf in COL_N:
         def pde(x_, y_):
             dc_x  = dde.grad.jacobian(y_, x_, i=0, j=0)
             dc_xx = dde.grad.hessian(y_, x_, i=0, j=0)
-            dc_yy = dde.grad.hessian(y_, x_, i=1, j=1)   # CORRECTIF (i=1, j=1)
+            dc_yy = dde.grad.hessian(y_, x_, i=1, j=1)   
             uv = 6.0 * x_[:, 1:2] * (1.0 - x_[:, 1:2])
             return PE * uv * dc_x - dc_xx - KAPPA * dc_yy
         on_i = lambda x_, ob: ob and np.isclose(x_[0], 0.0)
