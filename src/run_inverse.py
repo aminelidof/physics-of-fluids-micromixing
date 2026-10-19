@@ -12,7 +12,7 @@ import deepxde as dde
 L, H, D, U, KAPPA_TRUE = 5.0e-4, 1.0e-4, 1.0e-9, 1.0e-4, 8.0
 Ls, DELTA, PE, Ts = L / H, 0.1, U * H / D, 1.0
 NOBS, ITER, LBFGS_ITER, RESTARTS = 400, 6000, 3000, 2
-X_OBS_MAX = 1.5                       # capteurs dans la zone informative
+X_OBS_MAX = 1.5                        
 NOISE = [0.0, 0.01, 0.05]
 
 def sig(x):
@@ -73,13 +73,13 @@ for sn in NOISE:
             dde.config.set_random_seed(42)
         except Exception:
             pass
-        kappa = dde.Variable(1.0)              # inconnue, init = 1 (aucun prior)
+        kappa = dde.Variable(1.0)             
         geom = dde.geometry.Rectangle([0.0, 0.0], [Ls, 1.0])
 
         def pde(x_, y_):
             dc_x  = dde.grad.jacobian(y_, x_, i=0, j=0)
             dc_xx = dde.grad.hessian(y_, x_, i=0, j=0)
-            dc_yy = dde.grad.hessian(y_, x_, i=1, j=1)   # CORRECTIF (i=1, j=1)
+            dc_yy = dde.grad.hessian(y_, x_, i=1, j=1)   
             uv = 6.0 * x_[:, 1:2] * (1.0 - x_[:, 1:2])
             return PE * uv * dc_x - dc_xx - kappa * dc_yy
 
@@ -110,7 +110,7 @@ for sn in NOISE:
         k_adam = get_kappa(kappa)
         print("   apres Adam : kappa_hat = {:.3f}".format(k_adam))
 
-        # --- Raffinements L-BFGS (restarts) : decisifs pour kappa ---
+  
         for r_ in range(RESTARTS):
             try:
                 m.compile("L-BFGS", external_trainable_variables=[kappa])
